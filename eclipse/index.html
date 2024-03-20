@@ -1,0 +1,55 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<div class="box">
+    <p class="text" id="timer">Loading...</p>
+</div>
+
+<style>
+    @font-face {
+        font-family: "vcr-osd-mono";
+        src: url('./vcr.ttf');
+    }
+    
+    .box {
+        position: absolute;
+        top: -35;
+        right: 150;
+    }
+    
+    .text {
+        padding: 20px;
+        background: rgb(0, 163, 224);
+        font-family: "vcr-osd-mono";
+        font-size: 40pt;
+        color: #fff;
+        overflow: hidden;
+    }
+</style>
+
+<script src="./cash.min.js"></script>
+<script src="./moment-with-locales.js"></script>
+<script src="./moment-timezone-with-data.js"></script>
+
+<script>
+    // Update the count down every 1 second
+    var x = setInterval(function() {
+        // Display the result in the element with id="demo"
+        document.getElementById("timer").innerHTML = moment().tz(moment.tz.guess()).format('hh:mm:ss z') + " // " + moment().tz(getZoneFromOffset(getQueryVariable("timezone"))).format('hh:mm:ss z');
+    }, 1000);
+
+    const getZoneFromOffset = offsetString => moment.tz.names().filter(tz => moment.tz(tz).format('Z') === offsetString)[0]
+
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] == variable) {
+                return pair[1];
+            }
+        }
+        $(".text").css("background", "rgb(135,0,0)");
+        document.getElementById("timer").innerHTML = "Value \'" + variable + "\' not found!"
+        clearInterval(x);
+    }
+</script>
