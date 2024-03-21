@@ -27,17 +27,28 @@
 </style>
 
 <script src="./cash.min.js"></script>
-<script src="./moment-with-locales.js"></script>
-<script src="./moment-timezone-with-data.js"></script>
+<script src="./moment.min.js"></script>
+<script src="./moment-timezone-with-data-10-year-range.min.js"></script>
 
-<script>
+<script async>
+    var target = getQueryVariable("timezone");
+
+    var tz = Object.keys(moment.tz._names).find((e) => {
+        let name = moment.tz._names[e];
+        return moment.tz.zone(name).abbr(moment()) === target;
+    });
+
     // Update the count down every 1 second
-    var x = setInterval(function() {
-        // Display the result in the element with id="demo"
-        document.getElementById("timer").innerHTML = moment().tz(moment.tz.guess()).format('hh:mm:ss z') + " // " + moment().tz(getZoneFromOffset(getQueryVariable("timezone"))).format('hh:mm:ss z');
-    }, 1000);
+    var x = setInterval(update, 1000);
 
-    const getZoneFromOffset = offsetString => moment.tz.names().filter(tz => moment.tz(tz).format('Z') === offsetString)[0]
+    function update() {
+        // Display the result in the element with id="demo"
+        if (tz == null) {
+            clearInterval(x);
+            throwError("Unable to find timezone " + target);
+        }
+        document.getElementById("timer").innerHTML = moment().tz(moment.tz.guess()).format('hh:mm:ss z') + " // " + moment().tz(tz).format('hh:mm:ss z');
+    }
 
     function getQueryVariable(variable) {
         var query = window.location.search.substring(1);
@@ -48,8 +59,14 @@
                 return pair[1];
             }
         }
-        $(".text").css("background", "rgb(135,0,0)");
-        document.getElementById("timer").innerHTML = "Value \'" + variable + "\' not found!"
+        throwError("Value \'" + variable + "\' not found!");
         clearInterval(x);
     }
+
+    function throwError(msg) {
+        $(".text").css("background", "rgb(135,0,0)");
+        document.getElementById("timer").innerHTML = msg;
+    }
+
+    update();
 </script>
