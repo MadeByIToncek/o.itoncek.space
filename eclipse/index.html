@@ -1,36 +1,48 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
-<div class="box">
-    <p class="text" id="timer">Loading...</p>
-</div>
+<body>
+    <div class="timebox">
+        <p class="text" id="timer">Loading...</p>
+    </div>
+    <div class="progressbox">
+        <p class="text" id="countdown">Loading...</p>
+    </div>
 
-<style>
-    @font-face {
-        font-family: "vcr-osd-mono";
-        src: url('./vcr.ttf');
-    }
-    
-    .box {
-        position: absolute;
-        top: -35;
-        right: 20;
-    }
-    
-    .text {
-        padding: 20px;
-        background: rgb(0, 163, 224);
-        font-family: "vcr-osd-mono";
-        font-size: 40pt;
-        color: #fff;
-        overflow: hidden;
-    }
-</style>
+    <style>
+        @font-face {
+            font-family: "vcr-osd-mono";
+            src: url('./vcr.ttf');
+        }
+        
+        .timebox {
+            position: absolute;
+            top: -35;
+            right: 20;
+        }
+        
+        .progressbox {
+            position: absolute;
+            top: 70;
+            right: 20;
+        }
+        
+        .text {
+            padding: 20px;
+            background: rgb(0, 163, 224);
+            font-family: "vcr-osd-mono";
+            font-size: 40pt;
+            color: #fff;
+            overflow: hidden;
+        }
+    </style>
+</body>
 
 <script src="./cash.min.js"></script>
-<script src="./moment.min.js"></script>
+<script src="./moment-with-locales.min.js"></script>
 <script src="./moment-timezone-with-data-10-year-range.min.js"></script>
 
 <script async>
+    moment.locale("cs");
     var target = getQueryVariable("timezone");
 
     var tz = Object.keys(moment.tz._names).find((e) => {
@@ -44,10 +56,10 @@
     function update() {
         // Display the result in the element with id="demo"
         if (tz == null) {
-            clearInterval(x);
             throwError("Unable to find timezone " + target);
         }
         document.getElementById("timer").innerHTML = moment().tz(moment.tz.guess()).format('HH:mm:ss z') + " // " + moment().tz(tz).format('HH:mm:ss z');
+        updateProgress()
     }
 
     function getQueryVariable(variable) {
@@ -60,13 +72,26 @@
             }
         }
         throwError("Value \'" + variable + "\' not found!");
-        clearInterval(x);
+    }
+
+    function updateProgress() {
+        let start = moment(getQueryVariable("eclStart"));
+        let end = moment(getQueryVariable("eclEnd"));
+        if (moment().isBefore(start)) {
+            let untilstart = moment.duration(start.tz(tz).diff(moment()));
+            document.getElementById("countdown").innerHTML = untilstart.humanize(true);
+        } else {
+            let untilend = moment.duration(end.tz(tz).diff(moment()));
+            document.getElementById("countdown").innerHTML = untilend.humanize(true);
+        }
     }
 
     function throwError(msg) {
         $(".text").css("background", "rgb(135,0,0)");
         document.getElementById("timer").innerHTML = msg;
+        clearInterval(x);
     }
 
     update();
+</script>e();
 </script>
