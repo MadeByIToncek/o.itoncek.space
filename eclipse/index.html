@@ -47,7 +47,7 @@
             clearInterval(x);
             throwError("Unable to find timezone " + target);
         }
-        document.getElementById("timer").innerHTML = moment().tz(moment.tz.guess()).format('hh:mm:ss z') + " // " + moment().tz(tz).format('hh:mm:ss z');
+        document.getElementById("timer").innerHTML = moment().tz(moment.tz.guess()).format('HH:mm:ss z') + " // " + moment().tz(tz).format('HH:mm:ss z');
     }
 
     function getQueryVariable(variable) {
