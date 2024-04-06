@@ -5,7 +5,7 @@
         <p class="text" id="timer">Loading...</p>
     </div>
     <div class="progressbox">
-        <p class="text" id="countdown">Loading...</p>
+        <p class="ratioBox" id="countdown">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
     </div>
 
     <style>
@@ -34,6 +34,15 @@
             color: #fff;
             overflow: hidden;
         }
+        
+        .ratioBox {
+            padding: 20px;
+            background: rgb(0, 163, 224);
+            font-family: "vcr-osd-mono";
+            font-size: 40pt;
+            color: #fff;
+            overflow: hidden;
+        }
     </style>
 </body>
 
@@ -42,6 +51,8 @@
 <script src="./moment-timezone-with-data-10-year-range.min.js"></script>
 
 <script async>
+    // http://127.0.0.1:5500/eclipse/?timezone=CDT&totalS=20240408T135207&totalE=20240408T135622&eclS=20240408T123517&eclE=20240408T151230
+
     moment.locale("cs");
     var target = getQueryVariable("timezone");
 
@@ -75,23 +86,75 @@
     }
 
     function updateProgress() {
-        let start = moment(getQueryVariable("eclStart"));
-        let end = moment(getQueryVariable("eclEnd"));
-        if (moment().isBefore(start)) {
-            let untilstart = moment.duration(start.tz(tz).diff(moment()));
-            document.getElementById("countdown").innerHTML = untilstart.humanize(true);
+        let eclS = moment(getQueryVariable("eclS"));
+        let totalS = moment(getQueryVariable("totalS"));
+        let totalE = moment(getQueryVariable("totalE"));
+        let eclE = moment(getQueryVariable("eclE"));
+
+        let totalDuration = moment.duration(eclE.diff(eclS)).asMilliseconds();
+        let durationSinceStart = moment.duration(moment().diff(eclS)).asMilliseconds();
+        let totalStartRelative = moment.duration(totalS.diff(eclS)).asMilliseconds();
+        let totalEndRelative = moment.duration(totalE.diff(eclS)).asMilliseconds();
+
+
+        let totalStartRatio = totalStartRelative / totalDuration;
+        let totalEndRatio = totalEndRelative / totalDuration;
+        let currentRatio = durationSinceStart / totalDuration;
+        let tminus30 = moment.duration(totalS.clone().subtract('seconds', 30).diff(eclS)).asMilliseconds() / totalDuration;
+        let tplus30 = moment.duration(totalE.clone().add('seconds', 30).diff(eclS)).asMilliseconds() / totalDuration;
+
+
+        if (moment().isBefore(eclS)) {
+            $(".ratioBox").css("background", "linear-gradient(to right,  rgb(0, 163, 224) " + (tminus30 * 100) + "%, #000 " + (totalStartRatio * 100) + "%, #000 " + (totalEndRatio * 100) + "%, rgb(0, 163, 224) " + (tplus30 * 100) + "%)");
+            console.log("before eclS")
+        } else if (moment().isBetween(eclS, totalS.clone().subtract('seconds', 30))) {
+            $(".ratioBox").css("background", "linear-gradient(to right," +
+                " rgb(0, 163, 224) 0%," +
+                " rgb(0, 163, 224) " + ((currentRatio * 100) - .3) + "%," +
+                " #f00 " + (currentRatio * 100) + "%," +
+                " rgb(0, 163, 224) " + ((currentRatio * 100) + .3) + "%," +
+                " rgb(0, 163, 224) " + (tminus30 * 100) + "%," +
+                " #000 " + (totalStartRatio * 100) + "%," +
+                " #000 " + (totalEndRatio * 100) + "%," +
+                " rgb(0, 163, 224) " + (tplus30 * 100) + "%)");
+            console.log("before totalS")
+        } else if (moment().isBetween(totalS.clone().subtract('seconds', 30), totalE.clone().add('seconds', 30))) {
+            $(".ratioBox").css("background", "transparent");
+            $(".ratioBox").css("color", "rgba(255, 255, 255, 0.25)");
+            $(".text").css("background", "transparent");
+            $(".text").css("color", "rgba(255, 255, 255, 0.25)");
+            console.log("TOTALITY!!!")
+        } else if (moment().isBetween(totalE.clone().add('seconds', 30), eclE)) {
+            $(".ratioBox").css("background", "linear-gradient(to right," +
+                " rgb(0, 163, 224) " + (tminus30 * 100) + "%," +
+                " #000 " + (totalStartRatio * 100) + "%," +
+                " #000 " + (totalEndRatio * 100) + "%," +
+                " rgb(0, 163, 224) " + (tplus30 * 100) + "%," +
+                " rgb(0, 163, 224) " + ((currentRatio * 100) - .3) + "%," +
+                " #f00 " + (currentRatio * 100) + "%," +
+                " rgb(0, 163, 224) " + ((currentRatio * 100) + .3) + "%," +
+                " rgb(0, 163, 224) 100%)");
+            console.log("before eclE")
         } else {
-            let untilend = moment.duration(end.tz(tz).diff(moment()));
-            document.getElementById("countdown").innerHTML = untilend.humanize(true);
+            $(".ratioBox").css("background", "linear-gradient(to right, rgb(0, 163, 224) " + (tminus30 * 100) + "%, #000 " + (totalStartRatio * 100) + "%, #000 " + (totalEndRatio * 100) + "%, rgb(0, 163, 224) " + (tplus30 * 100) + "%)");
         }
+
+        //$(".ratioBox").css("background", "linear-gradient(to right, #7bdafc 0%, #333 50%, #eee 75%, #7bdafc 100%)");
+        //$(".ratioBox").css("background", "transparent");
+        //$(".ratioBox").css("color", "rgba(255, 255, 255, 0.25)");
+        //$(".text").css("background", "transparent");
+        //$(".text").css("color", "rgba(255, 255, 255, 0.25)");
+
+        //document.getElementById("countdown").innerHTML = totalStartRatio;
     }
 
     function throwError(msg) {
         $(".text").css("background", "rgb(135,0,0)");
+        $(".ratioBox").css("background", "rgb(135,0,0)");
         document.getElementById("timer").innerHTML = msg;
         clearInterval(x);
     }
 
     update();
-</script>e();
+</script>
 </script>
