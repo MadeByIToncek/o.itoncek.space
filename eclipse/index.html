@@ -106,7 +106,7 @@
 
         if (moment().isBefore(eclS)) {
             $(".ratioBox").css("background", "linear-gradient(to right,  rgb(0, 163, 224) " + (tminus30 * 100) + "%, #000 " + (totalStartRatio * 100) + "%, #000 " + (totalEndRatio * 100) + "%, rgb(0, 163, 224) " + (tplus30 * 100) + "%)");
-            console.log("before eclS")
+            //console.log("before eclS")
         } else if (moment().isBetween(eclS, totalS.clone().subtract('seconds', 30))) {
             $(".ratioBox").css("background", "linear-gradient(to right," +
                 " rgb(0, 163, 224) 0%," +
@@ -117,13 +117,13 @@
                 " #000 " + (totalStartRatio * 100) + "%," +
                 " #000 " + (totalEndRatio * 100) + "%," +
                 " rgb(0, 163, 224) " + (tplus30 * 100) + "%)");
-            console.log("before totalS")
+            //console.log("before totalS")
         } else if (moment().isBetween(totalS.clone().subtract('seconds', 30), totalE.clone().add('seconds', 30))) {
             $(".ratioBox").css("background", "transparent");
             $(".ratioBox").css("color", "rgba(255, 255, 255, 0.25)");
             $(".text").css("background", "transparent");
             $(".text").css("color", "rgba(255, 255, 255, 0.25)");
-            console.log("TOTALITY!!!")
+            //console.log("TOTALITY!!!")
         } else if (moment().isBetween(totalE.clone().add('seconds', 30), eclE)) {
             $(".ratioBox").css("background", "linear-gradient(to right," +
                 " rgb(0, 163, 224) " + (tminus30 * 100) + "%," +
@@ -134,7 +134,7 @@
                 " #f00 " + (currentRatio * 100) + "%," +
                 " rgb(0, 163, 224) " + ((currentRatio * 100) + .3) + "%," +
                 " rgb(0, 163, 224) 100%)");
-            console.log("before eclE")
+            //console.log("before eclE")
         } else {
             $(".ratioBox").css("background", "linear-gradient(to right, rgb(0, 163, 224) " + (tminus30 * 100) + "%, #000 " + (totalStartRatio * 100) + "%, #000 " + (totalEndRatio * 100) + "%, rgb(0, 163, 224) " + (tplus30 * 100) + "%)");
         }
